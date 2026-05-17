@@ -3,7 +3,7 @@ export const landingHtml = /* html */`<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PredMCP — Prediction markets for Claude</title>
+<title>PredMCP — Prediction markets for AI agents</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -217,7 +217,7 @@ export const landingHtml = /* html */`<!DOCTYPE html>
 </nav>
 
 <div class="hero">
-  <h1>Prediction markets + Hyperliquid perps,<br><em>inside Claude</em></h1>
+  <h1>Prediction markets + Hyperliquid perps,<br><em>for any LLM that calls tools</em></h1>
   <p class="subtitle">
     24 tools. Live data from Polymarket and Hyperliquid (perps + HIP-4) — cross-venue signals, funding outliers, arb opportunities, whale activity.
   </p>
@@ -402,7 +402,7 @@ export const landingHtml = /* html */`<!DOCTYPE html>
 
 <div class="signup-section">
   <h2>Get your free API key</h2>
-  <p>100 calls/day free. No credit card. Works with Claude Desktop in 30 seconds.</p>
+  <p>100 calls/day free. No credit card. Works with Claude Desktop, Cursor, Windsurf, or any MCP client in 30 seconds.</p>
   <div class="form-row">
     <input type="email" id="email" placeholder="you@example.com" autocomplete="email" required>
     <button id="btn" onclick="signup()">Get key</button>

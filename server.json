@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.RavioleLabs/predmcp",
   "title": "PredMCP",
-  "description": "Polymarket + Hyperliquid (perps + HIP-4) for Claude. 23 tools, signals & arb. Free tier.",
+  "description": "Polymarket + Hyperliquid (perps + HIP-4) for AI agents. 24 tools, signals & arb. Free tier.",
   "repository": {
     "url": "https://github.com/RavioleLabs/predmcp",
     "source": "github"

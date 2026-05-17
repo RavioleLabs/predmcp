@@ -1,7 +1,7 @@
 {
   "name": "predmcp",
   "version": "0.3.0",
-  "description": "MCP server bridging Polymarket and Hyperliquid (perps + HIP-4) into Claude. Free tier, self-hostable.",
+  "description": "MCP server bridging Polymarket and Hyperliquid (perps + HIP-4) into any LLM with tool calling. Free tier, self-hostable.",
   "license": "MIT",
   "author": "Raviole Labs",
   "homepage": "https://predmcp.com",

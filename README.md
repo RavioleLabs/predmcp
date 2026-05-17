@@ -1,8 +1,8 @@
 # PredMCP
 
-**Real-time prediction-market + Hyperliquid perps intelligence, plugged directly into Claude.**
+**Real-time prediction-market + Hyperliquid perps intelligence, plugged directly into any MCP-compatible client (Claude Desktop, Cursor, Windsurf, …) or any LLM that calls tools.**
 
-PredMCP is an [MCP](https://modelcontextprotocol.io) server that gives Claude live data from Polymarket and Hyperliquid (perpetuals + HIP-4 on-chain markets). Use it to ask one question and pull cross-venue context in a single answer — funding rates, orderbook depth, volume spikes, whale positions, prediction-market odds.
+PredMCP is an [MCP](https://modelcontextprotocol.io) server that gives any MCP-compatible LLM live data from Polymarket and Hyperliquid (perpetuals + HIP-4 on-chain markets). Use it to ask one question and pull cross-venue context in a single answer — funding rates, orderbook depth, volume spikes, whale positions, prediction-market odds.
 
 - **Hosted:** `https://predmcp.com/mcp` — free tier, 100 calls/day, one key per IP.
 - **Self-host:** clone, `npm install`, set a few env vars, run.
