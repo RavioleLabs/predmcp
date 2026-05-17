@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="96" fill="#0a0a0f"/>
+
+  <!-- Perp line (blue/solid) -->
+  <polyline points="72,340 152,280 232,300 312,180 392,220 440,160"
+    fill="none" stroke="#5b8dee" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Prediction line (green/dashed) — diverges higher -->
+  <polyline points="72,340 152,300 232,310 312,260 392,160 440,100"
+    fill="none" stroke="#00d084" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"
+    stroke-dasharray="18 8"/>
+
+  <!-- Divergence point -->
+  <circle cx="312" cy="220" r="12" fill="#7c5cfc" opacity="0.25"/>
+  <circle cx="312" cy="220" r="6" fill="#7c5cfc"/>
+
+  <!-- Label -->
+  <text x="256" y="450" text-anchor="middle"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+    font-size="76" font-weight="800" letter-spacing="-2">
+    <tspan fill="#ffffff">pred</tspan><tspan fill="#7c5cfc">mcp</tspan>
+  </text>
+</svg>

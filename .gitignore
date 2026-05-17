@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.env
+*.db
+*.db-shm
+*.db-wal
+~/.marketmcp/
+logs/
+docs/superpowers/
+docs/posts.md
+
+# Proprietary tools — premium logic, hosted only
+src/tools/private/
+.DS_Store

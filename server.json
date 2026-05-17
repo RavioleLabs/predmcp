@@ -1,0 +1,25 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.RavioleLabs/predmcp",
+  "title": "PredMCP",
+  "description": "Polymarket + Hyperliquid (perps + HIP-4) for Claude. 23 tools, signals & arb. Free tier.",
+  "repository": {
+    "url": "https://github.com/RavioleLabs/predmcp",
+    "source": "github"
+  },
+  "version": "0.3.0",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://predmcp.com/mcp",
+      "headers": [
+        {
+          "name": "x-api-key",
+          "description": "API key from predmcp.com/signup (free tier: 100 calls/day)",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}
