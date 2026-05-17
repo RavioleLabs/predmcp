@@ -56,9 +56,7 @@ These are the data-layer tools — direct, thin wrappers over Polymarket and Hyp
 - `get_open_interest` — OI in USD and contracts
 - `get_whale_trades` — recent large trades above a notional threshold
 - `get_top_funding_rates` — top perps by absolute funding rate
-- `get_funding_outliers` — perps whose funding spikes vs 7-day average
 - `get_oi_near_cap` — perps at the OI cap (entry blacklist)
-- `get_liquidation_clusters` — estimated mass-liquidation price levels
 - `get_orderbook_depth` — bid/ask depth + slippage estimate for any perp or HIP-4 market
 
 **Account**
@@ -70,7 +68,7 @@ These are the data-layer tools — direct, thin wrappers over Polymarket and Hyp
 
 This repo contains the **open-source half**: the MCP framework, the basic Polymarket and Hyperliquid fetchers, the auth/stats layer, the landing page. It's fully functional on its own — you can run a complete PredMCP instance from this code.
 
-A second set of tools — six cross-venue signals (divergence detection, whale convergence, HIP-4 ↔ Polymarket arb, etc.) — lives in a private folder (`src/tools/private/`) that is gitignored. The hosted server at predmcp.com loads them on startup; clones of this repo simply don't see them (the loader catches the import error silently). You'll see 18 tools in `tools/list`. The hosted server has 24.
+A second set of tools — eight proprietary tools (cross-venue signals + funding outlier and liquidation-cluster analytics) (divergence detection, whale convergence, HIP-4 ↔ Polymarket arb, etc.) — lives in a private folder (`src/tools/private/`) that is gitignored. The hosted server at predmcp.com loads them on startup; clones of this repo simply don't see them (the loader catches the import error silently). You'll see 16 tools in `tools/list` when running OSS. The hosted server has 24.
 
 The closed tools are kept closed because that's where the meaningful logic sits, and that's what funds the project. The open half is real, complete, and auditable — not a stub. If a closed tool is critical to your use case, run against the hosted endpoint; if you only need data tools, run your own.
 

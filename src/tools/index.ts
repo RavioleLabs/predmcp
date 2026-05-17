@@ -8,9 +8,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createApiKeySchema, createApiKeyHandler } from './create-api-key.js';
 import { getOrderbookDepthSchema, getOrderbookDepthHandler } from './get-orderbook-depth.js';
 import { getTopFundingRatesSchema, getTopFundingRatesHandler } from './get-top-funding-rates.js';
-import { getFundingOutliersSchema, getFundingOutliersHandler } from './get-funding-outliers.js';
 import { getOiNearCapSchema, getOiNearCapHandler } from './get-oi-near-cap.js';
-import { getLiquidationClustersSchema, getLiquidationClustersHandler } from './get-liquidation-clusters.js';
 import { getMarketsNearResolutionSchema, getMarketsNearResolutionHandler } from './get-markets-near-resolution.js';
 import { getVolumeSpikesSchema, getVolumeSpikesHandler } from './get-volume-spikes.js';
 import { getLateGameSportsSchema, getLateGameSportsHandler } from './get-late-game-sports.js';
@@ -167,29 +165,12 @@ export async function registerAllTools(server: McpServer): Promise<void> {
     annotations: RO,
   }, getTopFundingRatesHandler);
 
-  server.registerTool('get_funding_outliers', {
-    title: 'Get Funding Outliers',
-    description: 'Hyperliquid perps whose current funding rate deviates significantly from their 7-day average. A spike vs baseline is a stronger signal than raw rate.',
-    inputSchema: {
-      days: getFundingOutliersSchema.days,
-      min_deviation_factor: getFundingOutliersSchema.min_deviation_factor,
-    },
-    annotations: RO,
-  }, getFundingOutliersHandler);
-
   server.registerTool('get_oi_near_cap', {
     title: 'Get OI Near Cap',
     description: 'Lists Hyperliquid perps that are currently at the open interest cap — new long positions cannot be opened. Use as a blacklist to avoid getting rejected on entry.',
     inputSchema: getOiNearCapSchema,
     annotations: RO,
   }, getOiNearCapHandler);
-
-  server.registerTool('get_liquidation_clusters', {
-    title: 'Get Liquidation Clusters',
-    description: 'Estimated price levels where mass liquidations concentrate for a given Hyperliquid perp, computed from mark price and standard leverage multiples. Higher nearby orderbook liquidity = stronger support/resistance.',
-    inputSchema: { coin: getLiquidationClustersSchema.coin },
-    annotations: RO,
-  }, getLiquidationClustersHandler);
 
   server.registerTool('get_orderbook_depth', {
     title: 'Get Orderbook Depth',
