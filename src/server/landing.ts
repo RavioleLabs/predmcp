@@ -849,7 +849,7 @@ export const landingHtml = /* html */`<!DOCTYPE html>
     </div>
 
     <h3 style="margin-top:3rem;margin-bottom:0.4rem;font-size:1.15rem;color:var(--ink)">Pick your client</h3>
-    <p style="color:var(--ink-dim);font-size:0.92rem;margin:0">Step-by-step setup for the three most common MCP hosts. Replace <span class="inline-mono" style="font-family:var(--mono);color:var(--accent)">YOUR_KEY</span> with the key from signup.</p>
+    <p style="color:var(--ink-dim);font-size:0.92rem;margin:0">Three setup paths. Claude.ai signs you in directly via OAuth — no key handling. Everything else uses an API key (replace <span class="inline-mono" style="font-family:var(--mono);color:var(--accent)">YOUR_KEY</span>).</p>
 
     <div class="clients-grid">
 
@@ -876,16 +876,16 @@ export const landingHtml = /* html */`<!DOCTYPE html>
       <!-- Claude.ai web -->
       <div class="client-card">
         <h3>Claude.ai (web)</h3>
-        <p class="client-sub">Custom connector</p>
+        <p class="client-sub">Custom connector · No key needed</p>
         <ol>
           <li>Go to <a href="https://claude.ai/settings/connectors" target="_blank" rel="noopener" style="color:var(--accent)">claude.ai → Settings → Connectors</a>.</li>
           <li>Click <em>Add custom connector</em>. Name: <code>PredMCP</code>.</li>
-          <li>URL: paste the line below (the key goes in the query string).</li>
-          <li>Leave <em>OAuth Client ID</em> and <em>OAuth Client Secret</em> empty.</li>
-          <li>Click <em>Add</em>. The tools appear in the connector panel.</li>
+          <li>URL: paste <code>https://predmcp.com/mcp</code>. Leave <em>OAuth Client ID</em> and <em>OAuth Client Secret</em> blank.</li>
+          <li>Click <em>Add</em>. A predmcp.com page opens — enter your email, paste the 6-digit code we send you, done.</li>
+          <li>The 43 tools appear in the connector panel.</li>
         </ol>
-        <div class="client-code">https://predmcp.com/mcp?x-api-key=YOUR_KEY</div>
-        <p class="client-note">claude.ai's connector form only accepts OAuth fields, so we pass the key in the URL. The server reads <code>?x-api-key=</code> as a fallback. OAuth 2.1 + Dynamic Client Registration is on the roadmap.</p>
+        <div class="client-code">https://predmcp.com/mcp</div>
+        <p class="client-note">Uses OAuth 2.1 + Dynamic Client Registration (RFC 7591). Claude.ai auto-discovers our endpoints and runs the flow — no key to copy, no JSON to paste. New users get a free account in the same step.</p>
       </div>
 
       <!-- HTTP / SDK -->
