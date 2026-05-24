@@ -427,6 +427,13 @@ export function buildHttpServer() {
   fastify.get('/mcp', mcpRouteOptions, withIpContext(handleMcpRequest));
   fastify.delete('/mcp', mcpRouteOptions, withIpContext(handleMcpRequest));
 
+  // claude.ai's connector flow strips the path after OAuth and posts to /
+  // instead of /mcp (observed empirically). Mirror the MCP routes at root for
+  // POST/DELETE — GET / stays on the landing page since claude.ai never
+  // expects HTML there. The mcp-handler is path-agnostic.
+  fastify.post('/', mcpRouteOptions, withIpContext(handleMcpRequest));
+  fastify.delete('/', mcpRouteOptions, withIpContext(handleMcpRequest));
+
   // ── Public: live signal for landing page ────────────────────────────────────
   let _liveBtcCache: { data: unknown; at: number } | null = null;
   fastify.get('/api/live-signal', async () => {
