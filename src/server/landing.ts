@@ -1129,7 +1129,10 @@ async function signup() {
     }
 
     if (data.code === 'email_collision') {
-      err.innerHTML = '⚠ This email is already registered. <a href="#" onclick="recoverKey();return false;">Recover your key by email →</a>';
+      err.innerHTML = '✓ Email already registered — sending you a recovery code.';
+      // Auto-trigger recovery: user gave us their email, the obvious next step
+      // is to get them their existing key, not make them click another link.
+      await sendRecoveryOtp(email, null);
       return;
     }
 
