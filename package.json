@@ -1,6 +1,6 @@
 {
   "name": "predmcp",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "MCP server bridging Polymarket and Hyperliquid (perps + HIP-4) into any LLM with tool calling. Free tier, self-hostable.",
   "license": "MIT",
   "author": "Raviole Labs",
@@ -47,6 +47,7 @@
     "@types/node": "20.11.5",
     "tsx": "4.7.0",
     "typescript": "5.3.3",
-    "vitest": "1.3.1"
+    "vitest": "1.3.1",
+    "zod-to-json-schema": "^3.25.2"
   }
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { TTLCache } from '../src/cache/index.js';
+import { TTLCache } from '../src/core/cache/index.js';
 
 describe('TTLCache', () => {
   beforeEach(() => { vi.useRealTimers(); });

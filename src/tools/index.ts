@@ -17,15 +17,16 @@ import { getOddsSchema, getOddsHandler } from './get-odds.js';
 import { getOrderbookSchema, getOrderbookHandler } from './get-orderbook.js';
 import { getWhalePositionsSchema, getWhalePositionsHandler } from './get-whale-positions.js';
 import { getFundingRatesSchema, getFundingRatesHandler } from './get-funding-rates.js';
-import { getOpenInterestSchema, getOpenInterestHandler } from './get-open-interest.js';
 import { getWhaleTradesSchema, getWhaleTradesHandler } from './get-whale-trades.js';
 import { searchMarketsSchema, searchMarketsHandler } from './search-markets.js';
 import { getMoversSchema, getMoversHandler } from './get-movers.js';
-import { getFundingMomentumSchema, getFundingMomentumHandler } from './get-funding-momentum.js';
 import { getPriceSummarySchema, getPriceSummaryHandler } from './get-price-summary.js';
 import { getBasicMacroSchema, getBasicMacroHandler } from './get-basic-macro.js';
 import { getRecentNewsSchema, getRecentNewsHandler } from './get-recent-news.js';
 import { getSimpleIvSchema, getSimpleIvHandler } from './get-simple-iv.js';
+import { getRecentSignalsSchema, getRecentSignalsHandler } from './get-recent-signals.js';
+import { getOiHistorySchema, getOiHistoryHandler } from './get-oi-history.js';
+import { getMarketRegimeSchema, getMarketRegimeHandler } from './get-market-regime.js';
 import { createLogger } from '../core/logger.js';
 import { withTimestamp } from './with-timestamp.js';
 
@@ -143,15 +144,6 @@ export async function registerAllTools(server: McpServer): Promise<void> {
     annotations: RO,
   }, withTimestamp(getFundingRatesHandler, 10));
 
-  server.registerTool('get_open_interest', {
-    title: 'Get Open Interest',
-    description: 'Total open interest in USD and contracts for Hyperliquid perpetuals. Rising OI + rising price = strong trend; rising OI + falling price = short build-up.',
-    inputSchema: {
-      coins: z.array(z.string()).optional().describe('List of asset tickers to fetch, e.g. ["BTC", "SOL"]. Omit to fetch all available assets.'),
-    },
-    annotations: RO,
-  }, withTimestamp(getOpenInterestHandler, 10));
-
   server.registerTool('get_whale_trades', {
     title: 'Get Whale Trades',
     description: 'Recent large trades on Hyperliquid perps above a notional threshold. Includes side (long/short), size, price, and timestamp.',
@@ -186,13 +178,6 @@ export async function registerAllTools(server: McpServer): Promise<void> {
     annotations: RO,
   }, withTimestamp(getOrderbookDepthHandler, 3));
   // ── Public: simple intelligence ─────────────────────────────────────────────
-  server.registerTool('get_funding_momentum', {
-    title: 'Get Funding Momentum',
-    description: 'Current funding rate vs 24h average for a Hyperliquid perp. Simple snapshot — shows whether positioning is shifting in the last day. Pro adds 7d baseline + term structure + anomaly classification.',
-    inputSchema: getFundingMomentumSchema,
-    annotations: RO,
-  }, withTimestamp(getFundingMomentumHandler, 30));
-
   server.registerTool('get_price_summary', {
     title: 'Get Price Summary',
     description: 'One-call snapshot for an asset: mark price, 24h and 7d returns, 30d high/low, drawdown from high, rally from low, annualized realised volatility. Computed from 30d of HL hourly candles.',
@@ -221,7 +206,27 @@ export async function registerAllTools(server: McpServer): Promise<void> {
     annotations: RO,
   }, withTimestamp(getSimpleIvHandler, 30));
 
+  // ── Public: server-side accumulation (the always-on collector) ──────────────
+  server.registerTool('get_recent_signals', {
+    title: 'Get Recent Signals',
+    description: 'Server-detected events from the last hour: funding outliers (≥3x 7d baseline), whale trades (≥$100k), OI caps reached. Cursor-based — pass next_cursor back as since_id to receive only new events. The polling equivalent of the /sse/signals stream. Pro tool get_signal_history covers 7 days with forward-return outcomes.',
+    inputSchema: getRecentSignalsSchema,
+    annotations: RO,
+  }, withTimestamp(getRecentSignalsHandler, 1));
 
+  server.registerTool('get_oi_history', {
+    title: 'Get OI History',
+    description: 'Open-interest time series for a coin over the last 24h, from our continuous 5-min collector. Hyperliquid has NO OI-history endpoint — this data exists only on predmcp. Includes price + funding at each point. Pro tool get_oi_divergence classifies price-vs-OI regimes (squeeze/liquidation/new positioning) across all coins.',
+    inputSchema: getOiHistorySchema,
+    annotations: RO,
+  }, withTimestamp(getOiHistoryHandler, 5));
+
+  server.registerTool('get_market_regime', {
+    title: 'Get Market Regime',
+    description: 'One-call market regime classifier: RISK_ON_TRENDING / RISK_OFF / SQUEEZE_RISK / CHOP_LOW_VOL / MIXED. Combines BTC trend + realized vol, Deribit IV premium, funding breadth, and OI-weighted crowding across the top 50 perps. Call this FIRST each session to condition strategy choice.',
+    inputSchema: getMarketRegimeSchema,
+    annotations: RO,
+  }, withTimestamp(getMarketRegimeHandler, 5));
 
   // ── Private/premium tools (loaded if ./private/index.ts exists, gitignored) ──
   try {

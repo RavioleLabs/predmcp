@@ -67,6 +67,8 @@ function runMigrations(db: Database.Database): void {
     { version: 4, sql: MIGRATION_4 },
     { version: 5, sql: MIGRATION_5 },
     { version: 6, sql: MIGRATION_6 },
+    { version: 7, sql: MIGRATION_7 },
+    { version: 8, sql: MIGRATION_8 },
   ];
 
   for (const migration of migrations) {
@@ -186,6 +188,110 @@ const MIGRATION_6 = `
     created_at         INTEGER NOT NULL
   );
   CREATE INDEX IF NOT EXISTS idx_oauth_pending_expires ON oauth_pending_authorizations(expires_at);
+`;
+
+// ─── Migration 7: per-tool call tracking + early adopter slots ───────────────
+// Two additions:
+//
+// (a) `tool_calls` table — bucket calls by (hashed key, tool, hour) with a
+//     UPSERT-style increment. Dedupes within the hour, so a runaway bot loop
+//     that hammers one tool 1000x in 60s counts as exactly 1 distinct
+//     (tool, hour) bucket — the paywall trigger criterion ("≥100 distinct
+//     buckets/wk") stays meaningful. Content never logged, only call shape.
+//
+// (b) `early_adopter_slot` column on api_keys — INTEGER 1..50, NULL for
+//     keys #51+. Assigned atomically inside createKey via a SQLite
+//     transaction so two simultaneous signups can never both claim slot 50.
+//     These keys stay grandfathered for 90 days when the paywall activates.
+const MIGRATION_7 = `
+  CREATE TABLE IF NOT EXISTS tool_calls (
+    key_hash    TEXT NOT NULL,
+    tool_name   TEXT NOT NULL,
+    hour_bucket TEXT NOT NULL,                -- YYYY-MM-DDTHH UTC
+    count       INTEGER NOT NULL DEFAULT 1,
+    PRIMARY KEY (key_hash, tool_name, hour_bucket)
+  );
+  CREATE INDEX IF NOT EXISTS idx_tool_calls_hour ON tool_calls(hour_bucket);
+  CREATE INDEX IF NOT EXISTS idx_tool_calls_tool ON tool_calls(tool_name, hour_bucket);
+
+  ALTER TABLE api_keys ADD COLUMN early_adopter_slot INTEGER;
+  CREATE UNIQUE INDEX IF NOT EXISTS idx_keys_early_adopter ON api_keys(early_adopter_slot)
+    WHERE early_adopter_slot IS NOT NULL;
+`;
+
+// ─── Migration 8: market data persistence (the moat) ──────────────────────────
+// The signal-poller runs 24/7 detecting funding outliers, whale trades, and OI
+// caps — and until now threw everything away (SSE-only fan-out). These tables
+// turn uptime into a proprietary dataset that cannot be backfilled from any
+// public API (Hyperliquid has NO OI-history endpoint; our detection timestamps
+// under our rolling baselines are ours alone).
+//
+//   signal_events     — every emitted SignalEvent, with mark price at detection
+//   signal_outcomes   — forward returns (1h/4h/24h) resolved by a sweep job
+//   market_snapshots  — funding/OI/price/volume time series (5-min, top coins)
+//   whale_tape        — durable trade history ≥ threshold (restart-proof)
+//   wallet_stats      — behavioral fingerprints per address (from trade tape)
+//   funding_baselines — persisted baseline computations (warm restart)
+const MIGRATION_8 = `
+  CREATE TABLE IF NOT EXISTS signal_events (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    type        TEXT NOT NULL,
+    coin        TEXT NOT NULL,
+    detected_at INTEGER NOT NULL,
+    mark_px     REAL,
+    payload     TEXT NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS idx_sig_coin_time ON signal_events(coin, detected_at);
+  CREATE INDEX IF NOT EXISTS idx_sig_type_time ON signal_events(type, detected_at);
+
+  CREATE TABLE IF NOT EXISTS signal_outcomes (
+    event_id    INTEGER PRIMARY KEY REFERENCES signal_events(id),
+    px_detect   REAL NOT NULL,
+    ret_1h      REAL,
+    ret_4h      REAL,
+    ret_24h     REAL,
+    resolved_at INTEGER
+  );
+
+  CREATE TABLE IF NOT EXISTS market_snapshots (
+    coin    TEXT NOT NULL,
+    ts      INTEGER NOT NULL,
+    funding REAL,
+    oi      REAL,
+    mark_px REAL,
+    day_vlm REAL,
+    PRIMARY KEY (coin, ts)
+  ) WITHOUT ROWID;
+  CREATE INDEX IF NOT EXISTS idx_snap_ts ON market_snapshots(ts);
+
+  CREATE TABLE IF NOT EXISTS whale_tape (
+    coin     TEXT NOT NULL,
+    time     INTEGER NOT NULL,
+    px       REAL NOT NULL,
+    sz       REAL NOT NULL,
+    side     TEXT NOT NULL,
+    notional REAL NOT NULL,
+    PRIMARY KEY (coin, time, px, sz, side)
+  ) WITHOUT ROWID;
+  CREATE INDEX IF NOT EXISTS idx_tape_time ON whale_tape(time);
+
+  CREATE TABLE IF NOT EXISTS wallet_stats (
+    address        TEXT PRIMARY KEY,
+    first_seen     INTEGER NOT NULL,
+    last_seen      INTEGER NOT NULL,
+    trade_count    INTEGER NOT NULL DEFAULT 0,
+    total_notional REAL NOT NULL DEFAULT 0,
+    buy_count      INTEGER NOT NULL DEFAULT 0,
+    coins          TEXT NOT NULL DEFAULT '{}'
+  );
+
+  CREATE TABLE IF NOT EXISTS funding_baselines (
+    coin         TEXT NOT NULL,
+    computed_at  INTEGER NOT NULL,
+    baseline_abs REAL NOT NULL,
+    samples      INTEGER NOT NULL,
+    PRIMARY KEY (coin, computed_at)
+  ) WITHOUT ROWID;
 `;
 
 // ─── Audit helper ─────────────────────────────────────────────────────────────

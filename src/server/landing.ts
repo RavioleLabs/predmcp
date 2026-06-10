@@ -3,9 +3,9 @@ export const landingHtml = /* html */`<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PredMCP — Polymarket + Hyperliquid for AI agents</title>
-<meta name="description" content="MCP server for Polymarket + Hyperliquid perps. 43 tools, cross-venue signals, funding outliers, whale activity. Free tier 100/day, Pro $9/mo, 7-day trial.">
-<meta name="keywords" content="MCP server, Model Context Protocol, Polymarket API, Hyperliquid API, prediction markets API, crypto market data, AI agents, Claude tools, Cursor MCP, funding rates API, HIP-4, on-chain data">
+<title>PredMCP — Safe, read-only market data for AI trading agents</title>
+<meta name="description" content="47 MCP tools for Polymarket + Hyperliquid. Give your AI agent live market data, orderbooks, funding rates, whale activity — read-only by design. No execution endpoints. No keys at risk.">
+<meta name="keywords" content="MCP server, Model Context Protocol, read-only trading data, safe AI trading, Polymarket API, Hyperliquid API, prediction markets API, crypto market data, AI agents, Claude tools, Cursor MCP, funding rates API, HIP-4, on-chain data">
 <meta name="author" content="Raviole Labs">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
 <link rel="canonical" href="https://predmcp.com/">
@@ -13,8 +13,8 @@ export const landingHtml = /* html */`<!DOCTYPE html>
 <!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://predmcp.com/">
-<meta property="og:title" content="PredMCP — Polymarket + Hyperliquid data for AI agents">
-<meta property="og:description" content="43 MCP tools. Live data from Polymarket and Hyperliquid (perps + HIP-4) for any LLM that calls tools. Free tier, $9/mo Pro with 7-day trial.">
+<meta property="og:title" content="PredMCP — Safe, read-only market data for AI agents">
+<meta property="og:description" content="47 MCP tools spanning Polymarket and Hyperliquid (perps + HIP-4). Plug your agent into live trading data — without ever giving it the ability to execute orders. Free during early access.">
 <meta property="og:image" content="https://predmcp.com/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -24,8 +24,8 @@ export const landingHtml = /* html */`<!DOCTYPE html>
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@leraviole_">
-<meta name="twitter:title" content="PredMCP — Polymarket + Hyperliquid data for AI agents">
-<meta name="twitter:description" content="43 MCP tools. Live data from Polymarket and Hyperliquid for any LLM with tool calling. Free tier available.">
+<meta name="twitter:title" content="PredMCP — Safe, read-only market data for AI agents">
+<meta name="twitter:description" content="47 MCP tools for Polymarket + Hyperliquid. Read-only by design — your agent gets the data, never the keys. Free during early access.">
 <meta name="twitter:image" content="https://predmcp.com/og-image.png">
 
 <!-- Icons -->
@@ -53,10 +53,9 @@ export const landingHtml = /* html */`<!DOCTYPE html>
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "Cross-platform",
       "url": "https://predmcp.com/",
-      "description": "MCP server giving AI agents structured access to Polymarket and Hyperliquid market data. 43 tools including cross-venue signals, orderbook depth, funding rates, whale activity.",
+      "description": "MCP server giving AI agents safe, read-only access to Polymarket and Hyperliquid market data. 47 tools including cross-venue signals, orderbook depth, funding rates, whale activity. No execution endpoints — your agent reads markets, never trades them.",
       "offers": [
-        { "@type": "Offer", "name": "Free tier", "price": "0", "priceCurrency": "USD", "description": "100 calls/day" },
-        { "@type": "Offer", "name": "Pro", "price": "9", "priceCurrency": "USD", "description": "10,000 calls/day, 7-day free trial" }
+        { "@type": "Offer", "name": "Early access", "price": "0", "priceCurrency": "USD", "description": "All 47 tools, no credit card. First 50 signups grandfathered when paid plans launch." }
       ],
       "publisher": { "@id": "https://raviolelabs.com/#org" }
     },
@@ -676,7 +675,7 @@ export const landingHtml = /* html */`<!DOCTYPE html>
         </svg>
         Open source
       </a>
-      <span class="chip">FREE TIER</span>
+      <span class="chip">READ-ONLY · EARLY ACCESS</span>
     </div>
   </div>
 </header>
@@ -685,10 +684,12 @@ export const landingHtml = /* html */`<!DOCTYPE html>
 <section class="hero">
   <div class="hero-bg" aria-hidden="true"></div>
   <div class="container">
-    <h1>Polymarket + Hyperliquid,<br><em>for any LLM that calls tools.</em></h1>
+    <h1>Market data for AI agents.<br><em>Read-only by design.</em></h1>
     <p class="subtitle">
-      43 MCP tools. Live data from Polymarket and Hyperliquid (perps + HIP-4):
-      cross-venue signals, funding outliers, arb opportunities, whale activity.
+      47 MCP tools that cross Polymarket prediction markets, Hyperliquid perps,
+      and HIP-4 native predictions &mdash; with cross-venue divergence signals,
+      funding outliers, and whale flow built in. Your agent reads every market;
+      it never gets the keys to trade.
     </p>
 
     <div class="signal-block" id="signal-block">
@@ -713,43 +714,82 @@ export const landingHtml = /* html */`<!DOCTYPE html>
   </div>
 </div>
 
+<!-- ── Safety section ─────────────────────────────────────────────────── -->
+<section class="section" style="padding-top:3rem;padding-bottom:3rem;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg-elev)">
+  <div class="container">
+    <p class="kicker" style="color:var(--accent)">Safety by design</p>
+    <h2>Your agent gets the data. It never gets the keys.</h2>
+    <p class="section-sub">
+      The #1 worry when wiring an LLM to a trading venue is the same in every
+      conversation: <em>"and it can't actually trade, right?"</em> PredMCP is
+      built so that question has a single answer.
+    </p>
+    <div class="tool-grid" style="margin-top:1.5rem">
+      <div class="tool">
+        <span class="tool-name">No execution endpoint</span>
+        <p class="tool-desc">Zero order-placement code exists in this codebase. Not gated, not commented out &mdash; not implemented. There is nothing to enable.</p>
+      </div>
+      <div class="tool">
+        <span class="tool-name">No private keys touched</span>
+        <p class="tool-desc">We use the public Hyperliquid Info API and Polymarket Gamma API. Your wallet, your seed phrase, your accounts &mdash; never seen, never asked for.</p>
+      </div>
+      <div class="tool">
+        <span class="tool-name">47 tools, all queries</span>
+        <p class="tool-desc">Markets, orderbooks, funding rates, whale activity, signals. Every tool is a read. Your agent reasons about markets; you stay the only one who can act on them.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ── Tools grid ─────────────────────────────────────────────────────── -->
 <section class="section">
   <div class="container">
-    <p class="kicker">43 MCP tools</p>
+    <p class="kicker">47 MCP tools</p>
     <h2>A vocabulary for prediction markets.</h2>
     <p class="section-sub">
       Each tool is one verb your agent can call. Self-documenting via MCP.
-      Sixteen data tools ship in Free; thirteen cross-venue + intelligence
-      tools are Pro.
+      All 47 tools open during early access &mdash; no gating, no paid section.
     </p>
 
     <div class="tool-section">
-      <p class="tool-label">Intelligence · 5 tools · Pro</p>
+      <p class="tool-label">The accumulation layer · 6 tools · data only predmcp has</p>
       <div class="tool-grid">
-        <div class="tool"><span class="tool-name">get_signal_backtest</span><p class="tool-desc">Forward returns (1h / 4h / 24h) for historical instances of any signal. Median, win rate, Sharpe. Reason about EV before trading.</p></div>
-        <div class="tool"><span class="tool-name">get_conviction_score</span><p class="tool-desc">Aggregates funding, whale flow, OI, momentum into one directional score (-100..+100) + strength (0..100). Replaces 6 calls.</p></div>
-        <div class="tool"><span class="tool-name">get_funding_curve_anomaly</span><p class="tool-desc">Term structure: 1h vs 8h vs 24h vs 7d. Spikes, regime shifts, sign contradictions. Funding finer than the raw rate.</p></div>
-        <div class="tool"><span class="tool-name">get_setup_quality</span><p class="tool-desc">Execution score (0-100, A-F): spread, slippage, depth, vol regime, trend alignment, S&R distance. How good is entering RIGHT NOW.</p></div>
-        <div class="tool"><span class="tool-name">explain_signal</span><p class="tool-desc">Natural-language rationale from any signal output. Agents can forward to a user without exposing raw JSON.</p></div>
+        <div class="tool"><span class="tool-name">get_recent_signals</span><p class="tool-desc">Server-detected events from the last hour, cursor-based. The polling equivalent of the SSE stream — for agents that can't hold a connection.</p></div>
+        <div class="tool"><span class="tool-name">get_signal_history</span><p class="tool-desc">7 days of detected events, each joined with its measured 1h/4h/24h forward return. "What happened last time — and did it matter?"</p></div>
+        <div class="tool"><span class="tool-name">get_signal_performance</span><p class="tool-desc">Hit rates measured on OUR production detections, not backtest reconstructions. The live track record.</p></div>
+        <div class="tool"><span class="tool-name">get_oi_history</span><p class="tool-desc">Open-interest time series from our continuous 5-min collector. Hyperliquid has no OI-history endpoint — this exists only here.</p></div>
+        <div class="tool"><span class="tool-name">get_oi_divergence</span><p class="tool-desc">Price-vs-OI regime per coin: NEW_LONGS / SHORT_SQUEEZE / NEW_SHORTS / LONG_LIQUIDATION.</p></div>
+        <div class="tool"><span class="tool-name">get_whale_flow</span><p class="tool-desc">Cumulative whale buy/sell imbalance over hours-to-days from the durable ≥$25k trade tape.</p></div>
       </div>
     </div>
 
     <div class="tool-section">
-      <p class="tool-label">Cross-venue signals · 6 tools · Pro</p>
+      <p class="tool-label">Decision support · 7 tools</p>
+      <div class="tool-grid">
+        <div class="tool"><span class="tool-name">get_position_size</span><p class="tool-desc">Signal + bankroll → a number. Fractional-Kelly capped by orderbook depth, ATR stop, liquidation price, funding cost. Warns when liq sits inside your stop.</p></div>
+        <div class="tool"><span class="tool-name">get_signal_backtest</span><p class="tool-desc">Forward returns (1h / 4h / 24h) for historical instances of any signal. Median, win rate, Sharpe. Reason about EV before trading.</p></div>
+        <div class="tool"><span class="tool-name">get_conviction_score</span><p class="tool-desc">Aggregates funding, whale flow, OI, momentum into one directional score (-100..+100) + strength (0..100). Replaces 6 calls.</p></div>
+        <div class="tool"><span class="tool-name">get_setup_quality</span><p class="tool-desc">Execution score (0-100, A-F): spread, slippage, depth, vol regime, trend alignment, S&R distance. How good is entering RIGHT NOW.</p></div>
+        <div class="tool"><span class="tool-name">get_carry_scanner</span><p class="tool-desc">Funding carry NET of spread + slippage at your size, with break-even holding period and 7d stability score.</p></div>
+        <div class="tool"><span class="tool-name">get_cross_venue_funding</span><p class="tool-desc">HL vs Binance vs Bybit predicted funding spreads. Delta-neutral carry: long the cheap venue, short the rich one.</p></div>
+        <div class="tool"><span class="tool-name">get_funding_curve_anomaly</span><p class="tool-desc">Term structure: 1h vs 8h vs 24h vs 7d. Spikes, regime shifts, sign contradictions. Funding finer than the raw rate.</p></div>
+      </div>
+    </div>
+
+    <div class="tool-section">
+      <p class="tool-label">Cross-venue signals · 4 tools</p>
       <div class="tool-grid">
         <div class="tool"><span class="tool-name">get_signals</span><p class="tool-desc">Divergence between HL perp funding sentiment and HIP-4 prediction odds.</p></div>
         <div class="tool"><span class="tool-name">get_market_context</span><p class="tool-desc">All Polymarket + HIP-4 markets for any topic plus live HL perp data in one call.</p></div>
         <div class="tool"><span class="tool-name">get_pm_hl_divergences</span><p class="tool-desc">Markets where PM implied probability diverges from HL funding direction.</p></div>
-        <div class="tool"><span class="tool-name">get_hl_funding_pm_correlation</span><p class="tool-desc">Pairs each HL asset with related PM markets. Aligned or divergent signal.</p></div>
         <div class="tool"><span class="tool-name">get_hip4_vs_pm_arb</span><p class="tool-desc">Same market on HIP-4 and Polymarket with exploitable spread between venues.</p></div>
-        <div class="tool"><span class="tool-name">get_whale_convergence</span><p class="tool-desc">Simultaneous whale activity on HL perps and Polymarket. Leading indicator.</p></div>
       </div>
     </div>
 
     <div class="tool-section">
-      <p class="tool-label">Macro &amp; flow · 5 tools · Pro</p>
+      <p class="tool-label">Macro &amp; catalysts · 6 tools</p>
       <div class="tool-grid">
+        <div class="tool"><span class="tool-name">get_market_regime</span><p class="tool-desc">One-call regime classifier: RISK_ON_TRENDING / RISK_OFF / SQUEEZE_RISK / CHOP. Call first, every session.</p></div>
         <div class="tool"><span class="tool-name">get_macro_context</span><p class="tool-desc">DXY, US10Y, S&P, gold, VIX, BTC dominance, ETH/BTC. RISK_ON / RISK_OFF regime.</p></div>
         <div class="tool"><span class="tool-name">get_macro_liquidity</span><p class="tool-desc">BTC + ETH spot ETF flows (Farside) + USDT/USDC mint/burn (Etherscan). Fresh fiat-to-crypto flow.</p></div>
         <div class="tool"><span class="tool-name">get_cex_outflows</span><p class="tool-desc">Net ETH outflows from CEX hot wallets (Binance, Coinbase, OKX, Kraken). Outflow = bullish.</p></div>
@@ -759,37 +799,35 @@ export const landingHtml = /* html */`<!DOCTYPE html>
     </div>
 
     <div class="tool-section">
-      <p class="tool-label">Agent-native UX · 4 tools · Pro</p>
+      <p class="tool-label">Risk &amp; options · 3 tools</p>
       <div class="tool-grid">
         <div class="tool"><span class="tool-name">get_portfolio_risk</span><p class="tool-desc">Beta to BTC/ETH, correlation matrix, ann vol, 1d VaR for a list of positions.</p></div>
         <div class="tool"><span class="tool-name">get_options_iv</span><p class="tool-desc">BTC/ETH ATM IV, put-call skew, term structure via Deribit free feed.</p></div>
-        <div class="tool"><span class="tool-name">get_social_velocity</span><p class="tool-desc">Twitter mentions velocity + sentiment for an asset (best-effort via Nitter).</p></div>
         <div class="tool"><span class="tool-name">get_whale_label</span><p class="tool-desc">Look up an Ethereum address in our curated label DB (CEX, market makers, funds).</p></div>
       </div>
     </div>
 
     <div class="tool-section">
-      <p class="tool-label">Streaming · push, not polling · Pro</p>
+      <p class="tool-label">Streaming · push, not polling</p>
       <div class="tool-grid">
         <div class="tool"><span class="tool-name">GET /sse/signals</span><p class="tool-desc">Server-Sent Events stream of <code>funding_outlier_new</code>, <code>whale_trade</code>, <code>oi_cap_reached</code> events as they fire. One persistent connection replaces 1h polling.</p></div>
       </div>
     </div>
 
     <div class="tool-section">
-      <p class="tool-label">Hyperliquid · 7 tools · Free</p>
+      <p class="tool-label">Hyperliquid · 6 tools</p>
       <div class="tool-grid">
+        <div class="tool"><span class="tool-name">get_funding_rates</span><p class="tool-desc">Funding + OI + mark price for one or all perps in a single call.</p></div>
         <div class="tool"><span class="tool-name">get_top_funding_rates</span><p class="tool-desc">Top perps by absolute funding rate with OI and annualized yield.</p></div>
         <div class="tool"><span class="tool-name">get_funding_outliers</span><p class="tool-desc">Perps whose funding deviates from their 7-day average. Stronger signal than raw rate.</p></div>
         <div class="tool"><span class="tool-name">get_oi_near_cap</span><p class="tool-desc">Perps at the OI cap. New longs blocked. Use as blacklist for entry.</p></div>
         <div class="tool"><span class="tool-name">get_liquidation_clusters</span><p class="tool-desc">Price levels where mass liquidations concentrate by leverage multiple.</p></div>
-        <div class="tool"><span class="tool-name">get_funding_rates</span><p class="tool-desc">Raw funding rates for any asset.</p></div>
-        <div class="tool"><span class="tool-name">get_open_interest</span><p class="tool-desc">Open interest in USD and contracts across all perps.</p></div>
-        <div class="tool"><span class="tool-name">get_whale_trades</span><p class="tool-desc">Recent large trades above notional threshold.</p></div>
+        <div class="tool"><span class="tool-name">get_whale_trades</span><p class="tool-desc">Recent large trades above notional threshold, from the live 30s tape.</p></div>
       </div>
     </div>
 
     <div class="tool-section">
-      <p class="tool-label">Polymarket · 9 tools · Free</p>
+      <p class="tool-label">Polymarket &amp; basics · 14 tools</p>
       <div class="tool-grid">
         <div class="tool"><span class="tool-name">get_markets_near_resolution</span><p class="tool-desc">Markets resolving in the next N hours with probability above threshold.</p></div>
         <div class="tool"><span class="tool-name">get_volume_spikes</span><p class="tool-desc">Markets with abnormal 24h volume vs 7-day average. Often precedes news.</p></div>
@@ -797,9 +835,14 @@ export const landingHtml = /* html */`<!DOCTYPE html>
         <div class="tool"><span class="tool-name">get_movers</span><p class="tool-desc">Top 24h volume spikes and biggest price moves.</p></div>
         <div class="tool"><span class="tool-name">get_markets</span><p class="tool-desc">Live markets sorted by volume.</p></div>
         <div class="tool"><span class="tool-name">get_odds</span><p class="tool-desc">Current YES/NO price for any token.</p></div>
-        <div class="tool"><span class="tool-name">get_orderbook</span><p class="tool-desc">Full orderbook depth for any market.</p></div>
+        <div class="tool"><span class="tool-name">get_orderbook</span><p class="tool-desc">Full orderbook depth for any Polymarket token.</p></div>
+        <div class="tool"><span class="tool-name">get_orderbook_depth</span><p class="tool-desc">Depth + slippage estimate for any HL perp or HIP-4 market.</p></div>
         <div class="tool"><span class="tool-name">search_markets</span><p class="tool-desc">Full-text search across Polymarket and HIP-4.</p></div>
-        <div class="tool"><span class="tool-name">get_whale_positions</span><p class="tool-desc">Largest position holders in any market.</p></div>
+        <div class="tool"><span class="tool-name">get_whale_positions</span><p class="tool-desc">Positions of any Polymarket wallet, optionally filtered by market.</p></div>
+        <div class="tool"><span class="tool-name">get_price_summary</span><p class="tool-desc">Mark price, 24h/7d returns, 30d high/low, annualized vol in one call.</p></div>
+        <div class="tool"><span class="tool-name">get_basic_macro</span><p class="tool-desc">DXY, US10Y, S&P 500, gold, VIX from free Yahoo feed.</p></div>
+        <div class="tool"><span class="tool-name">get_recent_news</span><p class="tool-desc">Headlines for an asset from 4 crypto RSS feeds.</p></div>
+        <div class="tool"><span class="tool-name">get_simple_iv</span><p class="tool-desc">BTC/ETH ATM implied volatility + OI via Deribit.</p></div>
       </div>
     </div>
   </div>
@@ -813,7 +856,7 @@ export const landingHtml = /* html */`<!DOCTYPE html>
     <p class="section-sub">
       Claude Desktop, Cursor, Windsurf, Cline, Continue, Clawbot, custom
       runtimes. Drop the endpoint into your config, restart, and the
-      twenty-four tools show up.
+      forty-seven tools show up.
     </p>
 
     <div class="connect">
@@ -882,7 +925,7 @@ export const landingHtml = /* html */`<!DOCTYPE html>
           <li>Click <em>Add custom connector</em>. Name: <code>PredMCP</code>.</li>
           <li>URL: paste <code>https://predmcp.com/mcp</code>. Leave <em>OAuth Client ID</em> and <em>OAuth Client Secret</em> blank.</li>
           <li>Click <em>Add</em>. A predmcp.com page opens — enter your email, paste the 6-digit code we send you, done.</li>
-          <li>The 43 tools appear in the connector panel.</li>
+          <li>The 47 tools appear in the connector panel.</li>
         </ol>
         <div class="client-code">https://predmcp.com/mcp</div>
         <p class="client-note">Uses OAuth 2.1 + Dynamic Client Registration (RFC 7591). Claude.ai auto-discovers our endpoints and runs the flow — no key to copy, no JSON to paste. New users get a free account in the same step.</p>
@@ -909,7 +952,7 @@ export const landingHtml = /* html */`<!DOCTYPE html>
 </section>
 
 <!-- ── Signup ─────────────────────────────────────────────────────────── -->
-<section class="section">
+<section class="section" id="signup">
   <div class="narrow">
     <p class="kicker">Sign up</p>
     <div class="signup-card">
@@ -937,13 +980,11 @@ export const landingHtml = /* html */`<!DOCTYPE html>
         <p class="error-msg" id="otp-error"></p>
       </div>
 
-      <!-- Free user lost-key recovery → Pro upgrade -->
+      <!-- Free user lost-key recovery → manual support during early access -->
       <div id="free-recovery" style="display:none;margin-top:1.25rem;text-align:left;background:var(--bg);border:1px solid var(--line-strong);border-radius:var(--radius-sm);padding:1.25rem">
         <input type="hidden" id="free-recovery-email">
-        <p style="font-size:0.92rem;color:var(--ink);margin-bottom:0.5rem;font-weight:600">Looks like you already have a free key</p>
-        <p style="font-size:0.85rem;color:var(--ink-dim);margin-bottom:1rem">Email recovery is a Pro feature. Start the 7-day free trial — no charge until day 8, cancel anytime.</p>
-        <button onclick="startTrialFromRecovery()" class="button-full">Start 7-day free trial</button>
-        <p style="font-size:0.75rem;color:var(--ink-mute);margin-top:0.6rem;text-align:center">Or use a different email to generate a new free key.</p>
+        <p style="font-size:0.92rem;color:var(--ink);margin-bottom:0.5rem;font-weight:600">Looks like you already have a key</p>
+        <p style="font-size:0.85rem;color:var(--ink-dim);margin-bottom:0">Use a different email to generate a new key, or ping us on <a href="https://discord.gg/nVv6Ssr3" target="_blank" rel="noopener">Discord</a> to recover the existing one.</p>
       </div>
 
       <div id="result">
@@ -955,10 +996,10 @@ export const landingHtml = /* html */`<!DOCTYPE html>
           <div class="result-label" style="margin-top:1.2rem">Add to Claude Desktop config</div>
           <div class="config-block" id="configBlock"></div>
           <div style="margin-top:1.4rem;padding-top:1.2rem;border-top:1px solid var(--line)">
-            <button id="upgradeBtn" onclick="upgrade()" class="button-outline button-full">
-              Need more than 100 calls/day? Upgrade to Pro
-            </button>
-            <p class="hint" style="text-align:center">7-day free trial · $9/mo after · cancel anytime</p>
+            <p class="hint" style="text-align:center;font-size:0.78rem;color:var(--ink-mute)">
+              You signed up during early access &mdash; you're in. Need a higher rate limit? Ping us on
+              <a href="https://discord.gg/nVv6Ssr3" target="_blank" rel="noopener">Discord</a>.
+            </p>
           </div>
         </div>
       </div>
@@ -970,44 +1011,30 @@ export const landingHtml = /* html */`<!DOCTYPE html>
 <section class="section">
   <div class="container">
     <p class="kicker">Pricing</p>
-    <h2>Free to try. $9 when you need the signals.</h2>
+    <h2>Free during early access.</h2>
     <p class="section-sub">
-      No credit card on Free. Pro is $9/month with a 7-day trial,
-      billed through Polar (Merchant of Record, handles EU VAT).
+      All 47 tools open. No credit card. Paid plans land once we see real usage
+      &mdash; the first 50 signups stay grandfathered for 90 days when they do.
     </p>
 
-    <div class="price-grid">
-      <article class="price-card">
-        <header>
-          <p class="price-tier">FREE</p>
-          <div class="price-amount">$0<span class="per">/forever</span></div>
-        </header>
-        <ul class="price-features">
-          <li>100 calls per day</li>
-          <li>16 data tools (Polymarket + Hyperliquid)</li>
-          <li>Email signup, no credit card</li>
-          <li>One key per IP</li>
-          <li>Community Discord support</li>
-        </ul>
-      </article>
-
+    <div class="price-grid" style="grid-template-columns:1fr;max-width:520px;margin:0 auto">
       <article class="price-card price-card--accent">
         <header>
           <div style="display:flex;align-items:center;justify-content:space-between;gap:0.6rem;margin-bottom:0.6rem">
-            <p class="price-tier" style="margin:0">PRO · POWER USERS</p>
-            <span class="price-tag">7-DAY TRIAL</span>
+            <p class="price-tier" style="margin:0">EARLY ACCESS</p>
+            <span class="price-tag">FIRST 50 GRANDFATHERED</span>
           </div>
-          <div class="price-amount">$9<span class="per">/month</span></div>
+          <div class="price-amount">$0<span class="per">/right now</span></div>
         </header>
         <ul class="price-features">
-          <li>10,000 calls per day</li>
-          <li>All 43 tools including cross-venue signals</li>
-          <li>Cross-venue divergence detection</li>
-          <li>Funding outliers + liquidation clusters</li>
-          <li>Cancel anytime, no charge during trial</li>
+          <li>All 47 tools, no gating</li>
+          <li>100 calls per day per key</li>
+          <li>Email signup, no credit card</li>
+          <li>One key per IP</li>
+          <li>First 50 signups: 90-day grandfathered access when paid plans launch</li>
+          <li>Community Discord support</li>
         </ul>
-        <button onclick="startTrial()" class="button-full">Start 7-day free trial</button>
-        <p class="error-msg" id="trial-error" style="text-align:center"></p>
+        <a href="#signup" class="button-full" style="text-align:center;display:block">Get a free key</a>
       </article>
     </div>
   </div>

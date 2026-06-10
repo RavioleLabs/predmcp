@@ -1,23 +1,35 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Background matches site bg -->
   <rect width="512" height="512" rx="96" fill="#0a0a0f"/>
 
-  <!-- Perp line (blue/solid) -->
+  <!-- Subtle baseline -->
+  <line x1="72" y1="360" x2="440" y2="360" stroke="#18181b" stroke-width="2"/>
+
+  <!-- Perp line (muted, baseline market) -->
   <polyline points="72,340 152,280 232,300 312,180 392,220 440,160"
-    fill="none" stroke="#5b8dee" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    fill="none" stroke="#71717a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <!-- Prediction line (green/dashed) — diverges higher -->
+  <!-- Prediction line (brand emerald, divergent signal) -->
   <polyline points="72,340 152,300 232,310 312,260 392,160 440,100"
-    fill="none" stroke="#00d084" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"
-    stroke-dasharray="18 8"/>
+    fill="none" stroke="#34d399" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"
+    stroke-dasharray="20 9"/>
 
-  <!-- Divergence point -->
-  <circle cx="312" cy="220" r="12" fill="#7c5cfc" opacity="0.25"/>
-  <circle cx="312" cy="220" r="6" fill="#7c5cfc"/>
+  <!-- Divergence point (emerald glow) -->
+  <circle cx="312" cy="220" r="22" fill="#34d399" opacity="0.18"/>
+  <circle cx="312" cy="220" r="10" fill="#34d399"/>
 
-  <!-- Label -->
-  <text x="256" y="450" text-anchor="middle"
-    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-    font-size="76" font-weight="800" letter-spacing="-2">
-    <tspan fill="#ffffff">pred</tspan><tspan fill="#7c5cfc">mcp</tspan>
+  <!-- Read-only mark (small badge, top-right) -->
+  <g opacity="0.55">
+    <rect x="376" y="56" width="72" height="38" rx="9" fill="none" stroke="#34d399" stroke-width="3"/>
+    <text x="412" y="84" text-anchor="middle"
+      font-family="Inter, system-ui, sans-serif"
+      font-size="22" font-weight="700" letter-spacing="1" fill="#34d399">RO</text>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="256" y="452" text-anchor="middle"
+    font-family="Inter, system-ui, sans-serif"
+    font-size="78" font-weight="800" letter-spacing="-3">
+    <tspan fill="#fafafa">pred</tspan><tspan fill="#34d399">mcp</tspan>
   </text>
 </svg>

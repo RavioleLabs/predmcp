@@ -13,8 +13,22 @@ import type { FastifyRequest, FastifyReply } from 'fastify';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { buildServer } from '../../server/index.js';
 import { createLogger } from '../logger.js';
+import { recordToolCall } from '../auth/keys.js';
 
 const log = createLogger('mcp-handler');
+
+/** Peek at the parsed JSON-RPC body and, when it is a `tools/call`, record an
+ *  (api_key, tool_name, hour) bucket. Fire-and-forget — never affects the
+ *  request/response cycle. Tool *arguments* are never inspected. */
+function trackIfToolCall(body: unknown, apiKey: string | undefined): void {
+  if (!apiKey || !body || typeof body !== 'object') return;
+  const b = body as { method?: unknown; params?: unknown };
+  if (b.method !== 'tools/call') return;
+  const params = b.params as { name?: unknown } | undefined;
+  const name = params?.name;
+  if (typeof name !== 'string' || name.length === 0 || name.length > 128) return;
+  recordToolCall(apiKey, name);
+}
 
 export async function handleMcpRequest(
   request: FastifyRequest,
@@ -28,6 +42,15 @@ export async function handleMcpRequest(
   const server = await buildServer();
 
   try {
+    // Track per-tool usage before handing off to the transport. Reads the
+    // API key from the same header validateAndConsume uses, peeks the parsed
+    // JSON-RPC body to detect `tools/call`, and UPSERTs an hour bucket.
+    const apiKey = (request.headers['x-api-key'] as string | undefined)
+      ?? (typeof request.headers.authorization === 'string'
+        ? request.headers.authorization.replace(/^Bearer\s+/i, '')
+        : undefined);
+    trackIfToolCall(request.body, apiKey);
+
     // Connect the MCP server to the transport (registers message handlers)
     await server.connect(transport);
 

@@ -46,7 +46,9 @@ function hashIp(ip: string): string {
   return createHmac('sha256', IP_HASH_PEPPER).update(ip).digest('hex');
 }
 
-export type Tier = 'free' | 'pro';
+// 'admin' is an internal tier for operator + trusted-agent keys: no daily
+// limit, never sold, only creatable by direct DB insert or admin tooling.
+export type Tier = 'free' | 'pro' | 'admin';
 
 export interface ApiKey {
   key: string;
@@ -61,6 +63,7 @@ export interface ApiKey {
   polar_subscription_id?: string | null;
   subscription_status?: string | null;
   tokens_spent_today?: number;
+  early_adopter_slot?: number | null;
 }
 
 export interface AuthResult {
@@ -78,19 +81,40 @@ export function generateKey(): string {
   return KEY_PREFIX + randomBytes(24).toString('base64url');
 }
 
+const EARLY_ADOPTER_CAP = 50;
+
 export function createKey(email?: string, tier: Tier = 'free', ip?: string): ApiKey {
   const db = getDb();
   const key = generateKey();
   const now = Date.now();
-  // Store only the SHA-256 hash of the IP (used solely for one-key-per-IP).
   const ipHash = ip ? hashIp(ip) : null;
-  db.prepare(`
-    INSERT INTO api_keys (key, tier, email, calls_today, day_bucket, created_at, creator_ip)
-    VALUES (?, ?, ?, 0, '', ?, ?)
-  `).run(key, tier, email ?? null, now, ipHash);
-  // Log without the raw IP.
-  log.info('API key created', { tier, email: email ?? 'anon' });
+
+  // Atomic early-adopter slot assignment: a transaction guarantees two
+  // simultaneous signups cannot both grab the same slot. better-sqlite3 is
+  // synchronous and uses BEGIN IMMEDIATE under the hood for write transactions.
+  const tx = db.transaction((): number | null => {
+    const taken = (db.prepare(
+      'SELECT COUNT(*) AS n FROM api_keys WHERE early_adopter_slot IS NOT NULL'
+    ).get() as { n: number }).n;
+    const slot = taken < EARLY_ADOPTER_CAP ? taken + 1 : null;
+
+    db.prepare(`
+      INSERT INTO api_keys (key, tier, email, calls_today, day_bucket, created_at, creator_ip, early_adopter_slot)
+      VALUES (?, ?, ?, 0, '', ?, ?, ?)
+    `).run(key, tier, email ?? null, now, ipHash, slot);
+
+    return slot;
+  });
+
+  const slot = tx();
+  log.info('API key created', { tier, email: email ?? 'anon', early_adopter_slot: slot });
   return db.prepare('SELECT * FROM api_keys WHERE key = ?').get(key) as ApiKey;
+}
+
+/** SHA-256 of an API key for use as a foreign reference in `tool_calls`,
+ *  so the raw key never appears outside the api_keys row. */
+export function hashKey(rawKey: string): string {
+  return createHmac('sha256', 'predmcp:key-hash:v1').update(rawKey).digest('hex');
 }
 
 export function ipHasKey(ip: string): boolean {
@@ -121,6 +145,14 @@ export function validateAndConsume(rawKey: string): AuthResult {
     row.day_bucket = today;
   }
 
+  // 'admin' tier: internal/agent keys — counted for stats, never rate limited.
+  if (row.tier === 'admin') {
+    db.prepare(`
+      UPDATE api_keys SET calls_today = calls_today + 1, last_seen_at = ? WHERE key = ?
+    `).run(Date.now(), rawKey);
+    return { ok: true, key: { ...row, calls_today: row.calls_today + 1 }, remaining: Number.MAX_SAFE_INTEGER };
+  }
+
   // Rate limit check — free: 100/day, pro: 10,000/day
   const limit = row.tier === 'pro' ? PRO_DAILY_LIMIT : FREE_DAILY_LIMIT;
   if (row.calls_today >= limit) {
@@ -140,6 +172,29 @@ export function validateAndConsume(rawKey: string): AuthResult {
 export function getKeyInfo(rawKey: string): ApiKey | null {
   const db = getDb();
   return (db.prepare('SELECT * FROM api_keys WHERE key = ?').get(rawKey) as ApiKey) ?? null;
+}
+
+/** Records that `rawKey` invoked `toolName` during the current UTC hour.
+ *  UPSERT-style: deduped per (key, tool, hour). A bot that hammers one tool
+ *  1000x in 60s still counts as one distinct (tool, hour) bucket — the
+ *  paywall trigger criterion stays meaningful under loop abuse. Pure
+ *  fire-and-forget; never throws into the request path. */
+function _hourBucket(): string {
+  const d = new Date();
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}T${String(d.getUTCHours()).padStart(2, '0')}`;
+}
+
+export function recordToolCall(rawKey: string, toolName: string): void {
+  try {
+    const db = getDb();
+    const keyHash = hashKey(rawKey);
+    db.prepare(`
+      INSERT INTO tool_calls (key_hash, tool_name, hour_bucket, count) VALUES (?, ?, ?, 1)
+      ON CONFLICT(key_hash, tool_name, hour_bucket) DO UPDATE SET count = count + 1
+    `).run(keyHash, toolName, _hourBucket());
+  } catch (err) {
+    log.warn('recordToolCall failed (non-fatal)', { err: String(err) });
+  }
 }
 
 export function getKeyByEmail(email: string): ApiKey | null {

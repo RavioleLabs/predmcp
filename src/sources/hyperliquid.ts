@@ -340,6 +340,31 @@ export async function fetchCandles(
 }
 
 /**
+ * Predicted funding rates across venues (Hyperliquid + Binance + Bybit),
+ * straight from HL's own info endpoint. Free cross-exchange carry scanner data.
+ */
+export interface PredictedFundingRow {
+  coin: string;
+  venues: { venue: string; funding_rate: number; next_funding_time: number; interval_hours: number | null }[];
+}
+
+export async function fetchPredictedFundings(): Promise<PredictedFundingRow[]> {
+  log.debug('fetchPredictedFundings');
+  const raw = await getClient().predictedFundings();
+  return (raw ?? []).map(([asset, exchanges]: [string, [string, { fundingRate: string; nextFundingTime: number; fundingIntervalHours?: number } | null][]]) => ({
+    coin: asset,
+    venues: exchanges
+      .filter(([, data]) => data !== null)
+      .map(([venue, data]) => ({
+        venue,
+        funding_rate: parseFloat(data!.fundingRate),
+        next_funding_time: data!.nextFundingTime,
+        interval_hours: data!.fundingIntervalHours ?? null,
+      })),
+  }));
+}
+
+/**
  * Returns the historical funding rate series for a coin.
  * Wrapper kept here so private tools can import from a stable surface.
  */

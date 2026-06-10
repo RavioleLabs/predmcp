@@ -1,173 +1,110 @@
 # PredMCP
 
-**Real-time prediction-market + Hyperliquid perps intelligence, plugged directly into any MCP-compatible client (Claude Desktop, Cursor, Windsurf, …) or any LLM that calls tools.**
+**Safe, read-only market data for AI trading agents.**
 
-PredMCP is an [MCP](https://modelcontextprotocol.io) server that gives any MCP-compatible LLM live data from Polymarket and Hyperliquid (perpetuals + HIP-4 on-chain markets). Use it to ask one question and pull cross-venue context in a single answer — funding rates, orderbook depth, volume spikes, whale positions, prediction-market odds.
+44 MCP tools that cross **Polymarket** prediction markets, **Hyperliquid perps**, and **HIP-4** native predictions. Plug your agent into live trading data — without ever giving it the ability to execute orders.
 
-- **Hosted:** `https://predmcp.com/mcp` — free tier, 100 calls/day, one key per IP.
-- **Self-host:** clone, `npm install`, set a few env vars, run.
+Live, hosted, free during early access: [predmcp.com](https://predmcp.com)
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Free tier](https://img.shields.io/badge/free_tier-100_calls%2Fday-7c5cfc)](https://predmcp.com/signup)
+## Why read-only matters
 
----
+The #1 worry when wiring an LLM to a trading venue is the same in every conversation: *"and it can't actually trade, right?"* PredMCP is built so that question has a single answer.
 
-## Quick start (hosted)
+- **No execution endpoint.** Zero order-placement code exists in this codebase. Not gated, not commented out — not implemented. There is nothing to enable.
+- **No private keys touched.** We use the public Hyperliquid Info API and Polymarket Gamma API. Your wallet, your seed phrase, your accounts — never seen, never asked for.
+- **44 tools, all queries.** Markets, orderbooks, funding rates, whale activity, signals. Every tool is a read. Your agent reasons about markets; you stay the only one who can act on them.
 
-1. Get a free key at [predmcp.com](https://predmcp.com) (email + click "Get key").
-2. Add it to `claude_desktop_config.json`:
+## What's in the box
 
-   ```json
-   {
-     "mcpServers": {
-       "predmcp": {
-         "type": "http",
-         "url": "https://predmcp.com/mcp",
-         "headers": { "x-api-key": "your-key" }
-       }
-     }
-   }
-   ```
+### Public data (any free key)
+| Family | Tools |
+|--------|-------|
+| Polymarket | `get_markets` · `get_odds` · `get_orderbook` · `get_whale_positions` · `search_markets` · `get_movers` · `get_markets_near_resolution` · `get_volume_spikes` · `get_late_game_sports` |
+| Hyperliquid perps | `get_funding_rates` · `get_open_interest` · `get_whale_trades` · `get_orderbook_depth` · `get_top_funding_rates` · `get_oi_near_cap` · `get_funding_momentum` |
+| Macro & price | `get_price_summary` · `get_basic_macro` · `get_recent_news` · `get_simple_iv` |
 
-3. Restart Claude Desktop. Ask things like:
-   - *"What's BTC funding on Hyperliquid right now and how does it compare to the HIP-4 binary?"*
-   - *"Find Polymarket volume spikes today."*
-   - *"Show me the orderbook depth on HYPE before I size in."*
+### Intelligence (early access — free during the open phase)
+| Family | Tools |
+|--------|-------|
+| Cross-venue signals | `get_signals` · `get_market_context` · `get_pm_hl_divergences` · `get_hl_funding_pm_correlation` · `get_hip4_vs_pm_arb` · `get_whale_convergence` |
+| Signal intelligence | `get_signal_backtest` · `get_conviction_score` · `get_funding_curve_anomaly` · `get_setup_quality` · `explain_signal` |
+| Macro & flow | `get_macro_context` · `get_macro_liquidity` · `get_cex_outflows` · `get_upcoming_catalysts` · `get_news_correlation` |
+| Agent-native UX | `get_portfolio_risk` · `get_options_iv` · `get_social_velocity` · `get_whale_label` |
 
----
+Each tool is one verb your agent can call. Self-documenting via MCP.
 
-## Tools shipped in this repo (open source)
+## Examples
 
-These are the data-layer tools — direct, thin wrappers over Polymarket and Hyperliquid APIs, plus single-venue aggregations. The code is the spec.
+**Iran — what prediction markets say right now:**
+```
+"US x Iran peace deal by May 15"    → YES 20%  ($9M volume)
+"US x Iran peace deal by May 31"    → YES 34%  ($16M volume, +4% today)
+"Iranian regime falls before 2027"  → YES 15%  ($17M volume)
+"US invades Iran before 2027"       → YES 21%  ($26M volume)
+```
+One `get_market_context` call.
 
-**Polymarket**
-- `get_markets` — live markets, sorted by volume
-- `get_odds` — YES/NO price for any token
-- `get_orderbook` — full bid/ask depth for a market
-- `search_markets` — full-text search across PM + HIP-4
-- `get_whale_positions` — largest position holders in a market
-- `get_movers` — top 24h volume spikes and biggest price swings
-- `get_markets_near_resolution` — resolving soon with high probability
-- `get_volume_spikes` — abnormal 24h volume vs 7-day baseline
-- `get_late_game_sports` — sports markets closing soon with high-certainty leader
+**BTC cross-platform signal:**
+```
+HL perps:  $79,740  |  funding: neutral  |  OI: 31,100 BTC
+HIP-4:     BTC > $81,041 by 6am tomorrow  →  YES 12%  (market says no)
+Signal:    ✓ ALIGNED — perps neutral, prediction bearish
+```
+When these diverge, it's a signal. `get_signals` computes it.
 
-**Hyperliquid (perps + HIP-4)**
-- `get_funding_rates` — current funding for one or all perps
-- `get_open_interest` — OI in USD and contracts
-- `get_whale_trades` — recent large trades above a notional threshold
-- `get_top_funding_rates` — top perps by absolute funding rate
-- `get_oi_near_cap` — perps at the OI cap (entry blacklist)
-- `get_orderbook_depth` — bid/ask depth + slippage estimate for any perp or HIP-4 market
+**24h movers:**
+```
+"Will Bitcoin hit $150k by June 30?"   $5.8M traded in 24h
+"US x Iran permanent peace deal"       $3.2M in 24h  (+4% move)
+Athletics vs Phillies                  +55% price move
+```
 
-**Account**
-- `create_api_key` — programmatic signup (one email, one IP, 100 calls/day)
+## Use the hosted server (recommended)
 
----
+Get a free API key (email, no credit card, 100 calls/day) at [predmcp.com/signup](https://predmcp.com/signup), then drop into your `claude_desktop_config.json`:
 
-## What's in this repo vs. what's not
+```json
+{
+  "mcpServers": {
+    "predmcp": {
+      "type": "http",
+      "url": "https://predmcp.com/mcp",
+      "headers": { "x-api-key": "YOUR_KEY" }
+    }
+  }
+}
+```
 
-This repo contains the **open-source half**: the MCP framework, the basic Polymarket and Hyperliquid fetchers, the auth/stats layer, the landing page. It's fully functional on its own — you can run a complete PredMCP instance from this code.
+Also works with Cursor, Windsurf, Claude.ai (OAuth), and any MCP client that supports HTTP transport.
 
-A second set of tools — eight proprietary tools (cross-venue signals + funding outlier and liquidation-cluster analytics) (divergence detection, whale convergence, HIP-4 ↔ Polymarket arb, etc.) — lives in a private folder (`src/tools/private/`) that is gitignored. The hosted server at predmcp.com loads them on startup; clones of this repo simply don't see them (the loader catches the import error silently). You'll see 16 tools in `tools/list` when running OSS. The hosted server has 43 (16 OSS + 13 Pro intelligence and cross-venue).
+Ask your agent:
+- *"What are prediction markets saying about Iran right now?"*
+- *"Is there a divergence between BTC perp traders and prediction markets?"*
+- *"What markets moved the most in the last 24 hours?"*
+- *"Are any whales active on both Hyperliquid and Polymarket for BTC right now?"*
 
-The closed tools are kept closed because that's where the meaningful logic sits, and that's what funds the project. The open half is real, complete, and auditable — not a stub. If a closed tool is critical to your use case, run against the hosted endpoint; if you only need data tools, run your own.
+## Early access
 
----
+We're in an open early-access phase: all 44 tools, no gating, no credit card. The first 50 signups stay grandfathered for 90 days when paid plans launch.
 
-## Data collection (auditable)
+## Self-host
 
-This section describes **exactly** what the hosted predmcp.com server records. The code that does the recording is in this repo; you can read it in 30 seconds.
-
-### Per API key (table `api_keys`, see [src/core/auth/keys.ts](src/core/auth/keys.ts))
-
-| Column | What it is | Why |
-|---|---|---|
-| `key` | the 32-byte random key | identifier |
-| `tier` | `free` or `pro` | plan |
-| `email` | the email you provided at signup | recovery / billing |
-| `calls_today` | counter of API calls in the current UTC day | rate limit |
-| `day_bucket` | the YYYY-MM-DD that counter belongs to | reset logic |
-| `created_at` | ms timestamp of issuance | analytics |
-| `last_seen_at` | ms timestamp of the most recent call | "active users" metric |
-| `creator_ip` | HMAC-SHA-256(IP, server pepper) | one-key-per-IP enforcement |
-
-The raw IP is **never** persisted. We hash it with a server-side secret (HMAC pepper) at request time and compare hashes for the uniqueness check. Plain `SHA-256(IPv4)` would be reversible via rainbow tables; the HMAC pepper makes that infeasible.
-
-### What we do not log or store
-
-- Prompt content
-- Tool-call arguments (the values you pass to `coin`, `query`, `token_id`, `condition_id`, etc.)
-- Tool responses
-- Wallet addresses
-- Position data
-- Query strings beyond what's needed to authenticate
-- Your raw IP (only the HMAC hash)
-
-The default log level is `info`. Tool-call arguments are logged at `debug` only, and the `log.debug` calls in `src/sources/*` have been written to drop arguments entirely (see commits). Operators who set `LOG_LEVEL=debug` for local development get function names only, no payloads.
-
-### What this means in practice
-
-If you sign up on predmcp.com today, the only personally-identifying thing we hold tomorrow is:
-- your email
-- a counter of how many calls your key has made
-- the day buckets it was active in
-- an HMAC hash of the IP that signed up
-
-Pro tier (when launched via [Polar.sh](https://polar.sh)): the daily counter still increments for billing. Nothing else changes.
-
-### Audit log
-
-The schema has a tamper-evident `audit_log` table (chained SHA-256 hashes). It is **not currently written to** in the OSS code — it exists for future compliance use. You can grep for `audit(` to confirm it has no live callers.
-
----
-
-## Self-hosting
+The public OSS core covers the read-only data layer (Polymarket + Hyperliquid wrappers, MCP server, signup/auth). The intelligence/private tools (signals, conviction scores, macro flow) live in a private side module — the hosted version exposes them, the OSS one doesn't.
 
 ```bash
-git clone https://github.com/RavioleLabs/predmcp.git
+git clone https://github.com/RavioleLabs/predmcp
 cd predmcp
 npm install
 npm run build
-
-# Required env vars
-export ADMIN_SECRET="$(openssl rand -hex 32)"
-export IP_HASH_PEPPER="$(openssl rand -hex 32)"
-export TRUST_PROXY="loopback"   # if running behind nginx on the same host
-
-node dist/index.js
+IP_HASH_PEPPER="$(openssl rand -hex 32)" npm start
 ```
 
-The server listens on port 3000 by default. SQLite database lives at `~/.predmcp/predmcp.db`. The first signup creates the schema.
+Server runs on `http://localhost:3000/mcp`. Public data sources require no upstream API keys.
 
-Available env vars:
-- `ADMIN_SECRET` (required, ≥ 32 chars) — used for `Authorization: Bearer …` on `/admin/*`
-- `IP_HASH_PEPPER` (required, ≥ 32 chars) — used as the HMAC key for IP hashing
-- `TRUST_PROXY` — `true`, `loopback`, or a comma-separated CIDR list (default: don't trust any proxy)
-- `LOG_LEVEL` — `debug` / `info` / `warn` / `error` (default `info`)
+## Stack
 
----
-
-## Privacy summary
-
-- One key per IP at the hosted instance, enforced by HMAC hash.
-- Email is required for free tier; used for recovery only.
-- Raw IP never persisted.
-- Tool-call arguments and responses are never logged.
-- Pre-launch only stats: signup counts, daily call counters, active-user counts.
-
-If anything in this repo contradicts the above, that is a bug. Open an issue or a PR.
-
----
+TypeScript · Fastify · MCP SDK · SQLite (better-sqlite3) · Polymarket Gamma API · Hyperliquid Info API
 
 ## License
 
-MIT, see [LICENSE](LICENSE). Pull requests welcome on the open parts.
-
----
-
-## Links
-
-- Website: [predmcp.com](https://predmcp.com)
-- MCP Registry: `io.github.RavioleLabs/predmcp`
-- Smithery: [smithery.ai/server/leraviole/predmcp](https://smithery.ai/server/leraviole/predmcp)
-- Issues: [github.com/RavioleLabs/predmcp/issues](https://github.com/RavioleLabs/predmcp/issues)
+MIT — Raviole Labs.

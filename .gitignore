@@ -12,3 +12,4 @@ docs/posts.md
 # Proprietary tools — premium logic, hosted only
 src/tools/private/
 .DS_Store
+.gstack/
